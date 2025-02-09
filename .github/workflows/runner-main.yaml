@@ -51,11 +51,11 @@ jobs:
           export PATH=$HOME/.nimble/bin:$PATH
           nimble -v
 
-      - name: Install dependencies
-        run: |
-          export PATH=$HOME/.nimble/bin:$PATH
-          nimble refresh
-          nimble install -y --depsOnly
+      # - name: Install dependencies
+      #   run: |
+      #     export PATH=$HOME/.nimble/bin:$PATH
+      #     nimble refresh
+      #     nimble install -y --depsOnly
 
 
 

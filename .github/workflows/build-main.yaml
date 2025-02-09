@@ -18,3 +18,4 @@ jobs:
       release: 'main'
       nimversion: ${{ matrix.nim }}
     secrets: inherit
+
