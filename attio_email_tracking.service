@@ -61,7 +61,7 @@ ExecStart=/usr/bin/podman run \
         --env TRACKER_HOST_URL=https://your_host_url.com \
         --env EMAIL_CACHE_TIME=2592000 \
         --env EMAIL_CACHE_EXPIRED_REDIRECT=https://attio.com \
-        ghcr.io/thomastjdev/attio_email_tracking:latest
+        ghcr.io/thomastjdev/attioemailtracking:latest
 ExecStop=/usr/bin/podman stop \
         --ignore \
         --cidfile=%t/%n.ctr-id
