@@ -11,9 +11,9 @@ import
   mummy_utils
 
 import
-  src/attio_email_tracking/routes
+  src/utils/routes
 
-from src/attio_email_tracking/caching import cacheClear
+from src/utils/caching import cacheClear
 
 
 var router: Router
