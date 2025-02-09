@@ -13,7 +13,7 @@ jobs:
         nim: ["binary:2.2.2"]
     uses: ./.github/workflows/runner-main.yaml
     with:
-      container: 'attio_email_tracking'
+      container: 'attioemailtracking'
       release: 'prod'
       nimversion: ${{ matrix.nim }}
     secrets: inherit
