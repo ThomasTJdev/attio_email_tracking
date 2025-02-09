@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Gmail Auto-Tracker",
+  "version": "1.0",
+  "permissions": ["activeTab", "scripting"],
+  "host_permissions": ["https://mail.google.com/*", "https://your_host_url.com/*"],
+  "content_scripts": [
+    {
+      "matches": ["https://mail.google.com/*"],
+      "js": ["pageWorld.js", "inboxsdk.js","content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["*.map"],
+      "matches": ["https://mail.google.com/*"]
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+name: Build Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-matrix:
+    strategy:
+      fail-fast: false
+      matrix:
+        nim: ["binary:2.2.2"]
+    uses: ./.github/workflows/runner-main.yaml
+    with:
+      container: 'attio_email_tracking'
+      release: 'prod'
+      nimversion: ${{ matrix.nim }}
+    secrets: inherit

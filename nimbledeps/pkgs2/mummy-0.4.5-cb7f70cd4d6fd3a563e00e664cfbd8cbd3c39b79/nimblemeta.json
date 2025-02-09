@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "metaData": {
+    "url": "https://github.com/guzba/mummy",
+    "downloadMethod": "git",
+    "vcsRevision": "a2e2890407437dcaae3bbb92aa8609df72d11d47",
+    "files": [
+      "/mummy.nim",
+      "/mummy.nimble",
+      "/mummy/internal.nim",
+      "/mummy/routers.nim",
+      "/mummy/fileloggers.nim",
+      "/mummy/common.nim",
+      "/mummy/multipart.nim"
+    ],
+    "binaries": [],
+    "specialVersions": [
+      "0.4.5"
+    ]
+  }
+}

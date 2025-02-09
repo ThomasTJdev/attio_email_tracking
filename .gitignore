@@ -1,3 +1,8 @@
 nimcache/
 nimblecache/
 htmldocs/
+attio_email_tracking
+nimbledeps/*
+!nimbledeps/pkgs2
+dev.sh
+tests/image.png

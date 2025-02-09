@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "metaData": {
+    "url": "https://github.com/ThomasTJdev/mummy",
+    "downloadMethod": "git",
+    "vcsRevision": "9b86daab0c4c3843e288e565f79dcfb8e330c4c0",
+    "files": [
+      "/mummy.nim",
+      "/mummy/routers.nim",
+      "/mummy/common.nim",
+      "/mummy.nimble",
+      "/mummy/fileloggers.nim",
+      "/mummy/multipart.nim",
+      "/mummy/internal.nim"
+    ],
+    "binaries": [],
+    "specialVersions": [
+      "0.4.1"
+    ]
+  }
+}
