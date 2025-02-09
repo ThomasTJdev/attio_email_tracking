@@ -44,9 +44,9 @@
       }
     },
     "mummy": {
-      "version": "0.4.1",
-      "vcsRevision": "9b86daab0c4c3843e288e565f79dcfb8e330c4c0",
-      "url": "https://github.com/ThomasTJdev/mummy",
+      "version": "0.4.5",
+      "vcsRevision": "a2e2890407437dcaae3bbb92aa8609df72d11d47",
+      "url": "https://github.com/guzba/mummy",
       "downloadMethod": "git",
       "dependencies": [
         "zippy",
@@ -54,7 +54,7 @@
         "crunchy"
       ],
       "checksums": {
-        "sha1": "4b42e2d861877701288ea069a743dc74b6786e02"
+        "sha1": "cb7f70cd4d6fd3a563e00e664cfbd8cbd3c39b79"
       }
     },
     "mummy_utils": {
@@ -70,13 +70,13 @@
       }
     },
     "ready": {
-      "version": "0.1.8",
-      "vcsRevision": "a7bce99f44f850327c82530ab4fe0ae328425ccc",
-      "url": "https://github.com/ThomasTJdev/ready",
+      "version": "0.1.9",
+      "vcsRevision": "e8dc4bbcda772dbc166969c029f9f64c5f10d4cd",
+      "url": "https://github.com/guzba/ready",
       "downloadMethod": "git",
       "dependencies": [],
       "checksums": {
-        "sha1": "43b673f84c6aae398def181120f5322dd678127b"
+        "sha1": "eb012005ecdfb8aa78e8226241a58fd800829bec"
       }
     }
   },

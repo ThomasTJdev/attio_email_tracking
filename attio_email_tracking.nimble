@@ -9,6 +9,6 @@ srcDir        = "src"
 
 # Dependencies
 requires "nim >= 2.2.2"
-requires "https://github.com/ThomasTJdev/ready == 0.1.8"
-requires "https://github.com/ThomasTJdev/mummy == 0.4.1"
+requires "ready >= 0.1.8"
+requires "mummy >= 0.4.1"
 requires "https://github.com/ThomasTJdev/mummy_utils >= 0.1.0"
