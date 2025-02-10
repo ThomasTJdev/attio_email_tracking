@@ -2,7 +2,16 @@
   "manifest_version": 3,
   "name": "Gmail Auto-Tracker",
   "version": "1.0",
-  "permissions": ["activeTab", "scripting"],
+  "permissions": ["activeTab", "scripting", "storage"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Configure tracking"
+  },
+  "icons": {
+    "16": "mail_logo.png",
+    "48": "mail_logo.png",
+    "128": "mail_logo.png"
+  },
   "host_permissions": ["https://mail.google.com/*", "https://your_host_url.com/*"],
   "content_scripts": [
     {

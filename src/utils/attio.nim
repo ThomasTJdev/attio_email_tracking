@@ -18,7 +18,7 @@ type
     click
 
 
-proc attioApiClient*(envAttioBearer: string): HttpClient =
+template attioApiClient*(envAttioBearer: string): HttpClient =
   ## Create a new HTTP client with the required headers
   let client = newHttpClient()
   client.headers = newHttpHeaders({
@@ -26,7 +26,7 @@ proc attioApiClient*(envAttioBearer: string): HttpClient =
     "authorization": "Bearer " & envAttioBearer,
     "content-type": "application/json"
   })
-  return client
+  client
 
 
 proc attioApiSend*(httpMethod: HttpMethod, path: string, body: JsonNode): tuple[success: bool, body: string] =
@@ -155,9 +155,9 @@ proc emailAction*(parsed: JsonNode, mailAction: MailAction, userAgent = "", clic
     let
       info = (
         if mailAction == MailAction.open:
-          now().utc.format("YYYY-MM-dd HH:mm") & ": " & subject & " - [" & userAgent & "]"
+          subject & " - (" & now().utc.format("YYYY-MM-dd HH:mm 'UTC'") & ")" #& " - [" & userAgent & "]"
         else:
-          now().utc.format("YYYY-MM-dd HH:mm") & ": " & subject & " - URL: " & clickedUrl & " - [" & userAgent & "]"
+          subject & " - URL: " & clickedUrl & " - (" & now().utc.format("YYYY-MM-dd HH:mm 'UTC'") & ")" #& " - [" & userAgent & "]"
       )
 
     let body = %*{
@@ -195,9 +195,9 @@ proc emailAction*(parsed: JsonNode, mailAction: MailAction, userAgent = "", clic
     let
       info = (
         if mailAction == MailAction.open:
-          now().utc.format("YYYY-MM-dd HH:mm") & ": " & email & " opened: " & subject & " - [" & userAgent & "]"
+          email & " opened: " & subject & " - (" & now().utc.format("YYYY-MM-dd HH:mm 'UTC'") & ")" 
         else:
-          now().utc.format("YYYY-MM-dd HH:mm") & ": " & email & " clicked: " & subject & " - URL: " & clickedUrl & " - [" & userAgent & "]"
+          email & " clicked: " & subject & " - URL: " & clickedUrl & " - (" & now().utc.format("YYYY-MM-dd HH:mm 'UTC'") & ")" 
       )
 
     let body = %*{
@@ -235,9 +235,9 @@ proc emailAction*(parsed: JsonNode, mailAction: MailAction, userAgent = "", clic
     let
       info = (
         if mailAction == MailAction.open:
-          now().utc.format("YYYY-MM-dd HH:mm") & ": " & email & " opened: " & subject & " - [" & userAgent & "]"
+          email & " opened: " & subject & " - (" & now().utc.format("YYYY-MM-dd HH:mm 'UTC'") & ")"
         else:
-          now().utc.format("YYYY-MM-dd HH:mm") & ": " & email & " clicked: " & subject & " - URL: " & clickedUrl & " - [" & userAgent & "]"
+          email & " clicked: " & subject & " - URL: " & clickedUrl & " - (" & now().utc.format("YYYY-MM-dd HH:mm 'UTC'") & ")" 
       )
 
     let associatedCompany = attioApiGetCompanyUUID(domain)

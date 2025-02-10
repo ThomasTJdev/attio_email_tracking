@@ -8,6 +8,13 @@ This project is a simple server that receives webhooks from a Chrome extension a
 
 You can track data on people, companies, and deals objects in Attio.
 
+The screenshot belows shows a manual inject tracking button, but it can also
+be fully automated on both sends and schedules.
+
+![alt text](src/assets/screenshot_tracking_gmail.png)
+
+![alt text](src/assets/screenshot_settings.png)
+
 ## Requirements
 
 1. A Valkey or Redis server up and running.
@@ -31,18 +38,19 @@ Or download the zip file and extract it: [Download ZIP](https://github.com/Thoma
 
 Your Attio CRM manager will provide you with an API key and the endpoint to send the email tracking data to.
 
-#### Setup
-
-1. Open the `chrome_extension` folder in this repository.
-2. Edit the `manifest.json` file and replace `your_host_url.com` with the URL to your server.
-3. Edit the constants at the top of the `content.js` file.
-
 #### Load the extension
 
-1. Open Chrome and go to `chrome://extensions/`
-2. Enable Developer mode by toggling the switch in the top right corner.
-3. Click on `Load unpacked` and select the `chrome_extension` folder from this repository.
-4. Reload the Gmail page.
+1. Open the `manifest.json` file and replace the `https://your_host_url.com/` with your server URL.
+2. Open Chrome and go to `chrome://extensions/`
+3. Enable Developer mode by toggling the switch in the top right corner.
+4. Click on `Load unpacked` and select the `chrome_extension` folder from this repository.
+5. Reload the Gmail page.
+
+#### Configure extension
+
+1. Click on the extension icon in the top right corner.
+2. Enter the secret key and the endpoint URL from you Attio CRM manager.
+
 
 ### Server
 
@@ -114,6 +122,9 @@ export ATTIO_API_KEY=your_api_key
 
 # Rate limit for the Attio API (1 action per 5 seconds per object type)
 export ATTIO_API_RATE_LIMIT=5
+
+# Security token for adding new emails
+export ATTIO_WEBHOOK_SECRET=your_security_token
 
 # People and Company slug for the email tracking data
 export ATTIO_PEOPLE_SLUG_EMAIL_OPEN=email_opened

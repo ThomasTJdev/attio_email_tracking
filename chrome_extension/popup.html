@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tracking Settings</title>
+  <style>
+    body { font-family: Arial, sans-serif; width: 300px; padding: 10px; }
+    label { display: block; margin-top: 10px; font-weight: bold; }
+    input, button { width: 100%; padding: 8px; margin-top: 5px; }
+    input { width: calc(100% - 20px); }
+    button { cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h2 style="text-align: center;">Tracking Settings</h2>
+
+  <h3>Server settings</h3>
+  <div style="margin-bottom: 10px;">
+    <label for="serverUrl">Server URL:</label>
+    <input type="text" id="serverUrl" placeholder="https://mailer.cxplanner.com">
+  </div>
+
+
+  <div style="margin-bottom: 30px;">
+    <label for="secretKey">Secret Key:</label>
+    <input type="text" id="secretKey" placeholder="Enter secret key">
+  </div>
+
+
+  <h3>Personal settings</h3>
+
+  <div style="margin-bottom: 10px;">
+    <label for="trackingManually">
+      <div><b>Manual Tracking</b></div>
+      <div style="font-size: 12px; color: darkgray; font-weight: 300;">
+        To inject the tracking you must then click "Inject Tracking" for
+        each email you send. This is useful if you want to track only
+        specific emails.
+      </div>
+      <input type="checkbox" id="trackingManually" style="width: auto;"> <span style="font-weight: 300;">Will include a manual inject button</span>
+    </label>
+  </div>
+
+  <div style="margin-bottom: 30px;">
+    <label for="trackingOwner">Auto Track Owner Email:</label>
+    <div style="font-size: 12px; color: darkgray; font-weight: 300;">
+      If you are using multiple Gmail accounts in the same browser, then
+      inserting your primary CRM email here will auto inject the tracking.
+      It's only relevant when "Manual Tracking" is disabled.
+    </div>
+    <input type="email" id="trackingOwner" placeholder="Auto-track when sending from this">
+  </div>
+
+  <button id="saveButton">Save Settings</button>
+  <p id="status"></p>
+
+  <p style="font-size: 12p;text-align: center;"><a href="https://github.com/ThomasTJdev/attio_email_tracking">Thomas TJ - Github: attio_email_tracking</a></p>
+
+  <script src="popup.js"></script>
+</body>
+</html>
