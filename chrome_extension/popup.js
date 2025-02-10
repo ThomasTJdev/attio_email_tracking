@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("secretKey").value = data.CONSTANTS.SECRET_KEY || "";
       document.getElementById("trackingManually").checked = data.CONSTANTS.TRACKING_MANUALLY || false;
       document.getElementById("trackingOwner").value = data.CONSTANTS.TRACKING_AUTO_FOR_OWNER || "";
+      document.getElementById("customImgUrl").value = data.CONSTANTS.CUSTOM_IMAGE_URL || "";
     }
   });
 
@@ -16,6 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
       SECRET_KEY: document.getElementById("secretKey").value.trim(),
       TRACKING_MANUALLY: document.getElementById("trackingManually").checked,
       TRACKING_AUTO_FOR_OWNER: document.getElementById("trackingOwner").value.trim(),
+      CUSTOM_IMAGE_URL: document.getElementById("customImgUrl").value.trim(),
     };
 
     // Store constants

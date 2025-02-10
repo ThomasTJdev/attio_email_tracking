@@ -94,10 +94,19 @@ proc handlerWebhookAttioEmailOpen*(request: Request) =
     when defined(dev):
       echo("Error: event email_opened for ident: " & ident & " not found in cache")
 
-  var headers: HttpHeaders
-  headers["Content-Type"] = "image/png"
-  request.respond(200, headers, imageData)
-  return
+  let ext = @"ciurl"
+  if ext != "":
+    var headers: HttpHeaders
+    headers["Location"] = decode(ext)
+    request.respond(302, headers)
+    return
+
+  else:
+    var headers: HttpHeaders
+    headers["Content-Type"] = "image/png"
+    request.respond(200, headers, imageData)
+    return
+
 
 
 proc handlerWebhookAttioEmailClick*(request: Request) =

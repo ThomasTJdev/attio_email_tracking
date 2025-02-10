@@ -18,6 +18,7 @@ chrome.runtime.onInstalled.addListener(() => {
         SECRET_KEY: "xxx",
         TRACKING_MANUALLY: true,
         TRACKING_AUTO_FOR_OWNER: "you@main.crm.email",
+        CUSTOM_IMAGE_URL: "",
       };
 
       chrome.storage.local.set({ CONSTANTS }, () => {
@@ -67,34 +68,46 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 
-
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "sendTrackingData") {
-    const trackingData = message.trackingData;
-
-    fetch(CONSTANTS.SERVER_URL + "/webhook/attio/email" + "?secret=" + CONSTANTS.SECRET_KEY, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(trackingData),
-      keepalive: true,
-    })
-    .then(async (response) => {
-      const responseText = await response.text(); // Read raw response
-
-      console.log("🔄 Raw Server Response:", responseText);
-      console.log("📡 Response Status:", response.status);
-
-      if (response.ok) {
-        sendResponse({ success: true, data: responseText });
-      } else {
-        console.error("❌ Server returned an error:", response.status, responseText);
-        sendResponse({ success: false, error: responseText, msg: "❌ Server returned an error" });
+    chrome.storage.local.get("CONSTANTS", (data) => {
+      if (!data.CONSTANTS || !data.CONSTANTS.SERVER_URL || !data.CONSTANTS.SECRET_KEY) {
+        console.error("❌ Missing CONSTANTS values in storage");
+        sendResponse({ success: false, error: "Missing CONSTANTS values in storage" });
+        return;
       }
-    })
-    .catch((error) => {
-      console.error("❌ Network or Fetch Error:", error);
-      sendResponse({ success: false, error: error.message, msg: "❌ Network or Fetch Error" });
+
+      const trackingData = message.trackingData;
+      const { SERVER_URL, SECRET_KEY } = data.CONSTANTS;
+
+      console.log("📡 Sending tracking data to:", SERVER_URL);
+
+      fetch(`${SERVER_URL}/webhook/attio/email?secret=${SECRET_KEY}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(trackingData),
+        keepalive: true,
+      })
+      .then(async (response) => {
+        const responseText = await response.text();
+        console.log("🔄 Raw Server Response:", responseText);
+        console.log("📡 Response Status:", response.status);
+
+        if (response.ok) {
+          sendResponse({ success: true, data: responseText });
+        } else {
+          console.error("❌ Server error:", response.status, responseText);
+          sendResponse({ success: false, error: responseText, msg: "❌ Server error" });
+        }
+      })
+      .catch((error) => {
+        console.error("❌ Network Error:", error);
+        sendResponse({ success: false, error: error.message, msg: "❌ Network Error" });
+      });
+
+      return true; // ✅ Keep the message channel open for async response
     });
-    return true; // **Important!** Keeps `sendResponse` valid for async operations
+
+    return true; // ✅ Keep the message channel open
   }
 });

@@ -125,7 +125,7 @@ async function handleTracking(composeView) {
   if (!CONSTANTS) return;
 
   // Insert tracking pixel and rewrite links
-  insertTrackingPixel(composeView, trackingId, CONSTANTS.SERVER_URL);
+  insertTrackingPixel(composeView, trackingId, CONSTANTS.SERVER_URL, CONSTANTS.CUSTOM_IMAGE_URL);
   rewriteLinks(composeView, trackingId, CONSTANTS.SERVER_URL);
 }
 
@@ -175,11 +175,36 @@ function sendTrackingData(email, subject, trackingId) {
 }
 
 // Function to insert a tracking pixel into the email body
-function insertTrackingPixel(composeView, trackingId, SERVER_URL) {
-  const trackingUrl = SERVER_URL + "/webhook/attio/email_opened.png" + `?ident=${trackingId}&nocache=${Date.now()}`;
-  const trackingPixel = `<img src="${trackingUrl}" width="1" height="1" style="display:none;" />`;
+function insertTrackingPixel(composeView, trackingId, SERVER_URL, CUSTOM_IMAGE_URL) {
+  let trackingUrl = SERVER_URL + "/webhook/attio/email_opened.png" + `?ident=${trackingId}&nocache=${Date.now()}`;
+  if (CUSTOM_IMAGE_URL !== "") {
+    const customImageBase64 = btoa(CUSTOM_IMAGE_URL);
+    trackingUrl += `&ciurl=${customImageBase64}`;
+  }
 
-  composeView.insertHTMLIntoBodyAtCursor(trackingPixel);
+  let trackingPixel = `<img class="attio-tracking-pixel" src="${trackingUrl}" width="1" height="1" style="display:none;" />`;
+  if (CUSTOM_IMAGE_URL != "") {
+    trackingPixel = `<div class="attio-tracking-pixel" style="text-align: center"><img src="${trackingUrl}" width="auto" height="30" style="max-height: 60px; width: auto; padding-top: 10px;" /></div>`;
+  }
+
+  // 🗑️ Remove existing tracking pixels before inserting a new one
+  removeExistingTrackingPixels(composeView);
+
+  // ✅ Insert the new tracking pixel
+  //composeView.insertHTMLIntoBodyAtCursor(trackingPixel);
+  const bodyElement = composeView.getBodyElement();
+  if (bodyElement) {
+    bodyElement.insertAdjacentHTML('beforeend', trackingPixel);
+  }
+}
+
+// Function to remove old tracking pixels from the email body
+function removeExistingTrackingPixels(composeView) {
+  const body = composeView.getBodyElement();
+  if (!body) return;
+
+  const existingPixels = body.querySelectorAll(".attio-tracking-pixel");
+  existingPixels.forEach((pixel) => pixel.remove());
 }
 
 // Function to rewrite links in the email body with tracking ID
