@@ -187,7 +187,7 @@ function insertTrackingPixel(composeView, trackingId, SERVER_URL, CUSTOM_IMAGE_U
 
   let trackingPixel = `<img class="attio-tracking-pixel" src="${trackingUrl}" width="1" height="1" style="display:none;" />`;
   if (CUSTOM_IMAGE_URL != "") {
-    trackingPixel = `<div class="attio-tracking-pixel" style="text-align: center"><img src="${trackingUrl}" width="auto" height="30" style="max-height: 60px; width: auto; padding-top: 10px;" /></div>`;
+    trackingPixel = `<div class="attio-tracking-pixel" style="text-align: center"><img src="${trackingUrl}" width="auto" height="10" style="max-height: 10px; width: auto; padding-top: 10px;" /></div>`;
   }
 
   // 🗑️ Remove existing tracking pixels before inserting a new one
