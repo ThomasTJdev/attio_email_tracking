@@ -22,7 +22,7 @@ InboxSDK.load(2, 'sdk_TrackForAttio_665d14e77e').then(async (sdk) => {
         CONSTANTS.TRACKING_AUTO_FOR_OWNER &&
         CONSTANTS.TRACKING_AUTO_FOR_OWNER === sdk.User.getEmailAddress()
       ) {
-        attachSendListeners(composeView);
+        attachSendListeners(composeView, CONSTANTS);
       } else {
         // Add a custom "Inject Tracking" button to the compose toolbar
         composeView.addButton({
@@ -30,7 +30,7 @@ InboxSDK.load(2, 'sdk_TrackForAttio_665d14e77e').then(async (sdk) => {
           iconUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/wcAAwAB/atRngAAAABJRU5ErkJggg==', // 1x1 transparent PNG
           iconClass: 'custom-text-button',
           onClick: () => {
-            handleTracking(composeView);
+            handleTracking(composeView, CONSTANTS);
             composeView.getElement().querySelector(".custom-text-button").parentElement.style.display = "none";
           },
         });
@@ -43,7 +43,7 @@ InboxSDK.load(2, 'sdk_TrackForAttio_665d14e77e').then(async (sdk) => {
 
     } else {
       // Attach event listeners to native Send and Schedule Send buttons
-      attachSendListeners(composeView);
+      attachSendListeners(composeView, CONSTANTS);
     }
   });
 });
@@ -102,7 +102,7 @@ function modifyInboxSdkButton(button) {
 
 
 // Function to handle tracking
-async function handleTracking(composeView) {
+async function handleTracking(composeView, CONSTANTS) {
   // Get the first recipient's email address
   const recipients = composeView.getToRecipients();
   if (recipients.length === 0) {
@@ -118,22 +118,23 @@ async function handleTracking(composeView) {
   const trackingId = generateUniqueId();
 
   // Send tracking data to backend
+  console.log("📡 Sending tracking data");
   sendTrackingData(email, subject, trackingId);
 
-  // Get constants
-  const CONSTANTS = await getConstants();
-  if (!CONSTANTS) return;
-
   // Insert tracking pixel and rewrite links
+  console.log("🖼️ Inserting tracking pixel");
   insertTrackingPixel(composeView, trackingId, CONSTANTS.SERVER_URL, CONSTANTS.CUSTOM_IMAGE_URL);
+  console.log("🔗 Rewriting links");
   rewriteLinks(composeView, trackingId, CONSTANTS.SERVER_URL);
+  console.log("✅ Tracking completed");
 }
 
 // Function to attach event listeners to native Send and Schedule Send buttons
-function attachSendListeners(composeView) {
+async function attachSendListeners(composeView, CONSTANTS) {
+
   // Listen for the 'presending' event to trigger tracking before sending
   composeView.on('presending', (event) => {
-    handleTracking(composeView);
+    handleTracking(composeView, CONSTANTS);
   });
 }
 
@@ -172,6 +173,8 @@ function sendTrackingData(email, subject, trackingId) {
       }
     }
   );
+
+  console.log("📡 Tracking data sent background worker");
 }
 
 // Function to insert a tracking pixel into the email body
