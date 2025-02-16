@@ -109,6 +109,11 @@ Handler: handlerWebhookAttioEmailClick
 
 ## Environment variables
 
+**Attribute types**
+* email_opened => Text
+* email_clicked => Text
+* email_last_action => Timestamp
+
 ```sh
 # Webserver
 export WEBSERVER_HOST=0.0.0.0

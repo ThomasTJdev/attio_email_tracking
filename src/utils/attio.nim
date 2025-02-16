@@ -174,7 +174,7 @@ proc emailAction*(parsed: JsonNode, mailAction: MailAction, userAgent = "", clic
         "values": {
           "email_addresses": @[email],
           slug: info,
-          getEnv("ATTIO_PEOPLE_SLUG_EMAIL_LAST_ACTION", "email_last_action"): now().utc.format("YYYY-MM-dd HH:mm 'UTC'"),
+          getEnv("ATTIO_PEOPLE_SLUG_EMAIL_LAST_ACTION", "email_last_action"): now().utc.format("YYYY-MM-dd'T'HH:mm:ss"),
         }
       }
     }
@@ -215,7 +215,7 @@ proc emailAction*(parsed: JsonNode, mailAction: MailAction, userAgent = "", clic
         "values": {
           "domains": @[domain],
           slug: info,
-          getEnv("ATTIO_COMPANY_SLUG_EMAIL_LAST_ACTION", "email_last_action"): now().utc.format("YYYY-MM-dd HH:mm 'UTC'"),
+          getEnv("ATTIO_COMPANY_SLUG_EMAIL_LAST_ACTION", "email_last_action"): now().utc.format("YYYY-MM-dd'T'HH:mm:ss"),
         }
       }
     }
@@ -264,7 +264,7 @@ proc emailAction*(parsed: JsonNode, mailAction: MailAction, userAgent = "", clic
       "data": {
         "values": {
           slug: info,
-          getEnv("ATTIO_DEAL_SLUG_EMAIL_LAST_ACTION", "email_last_action"): now().utc.format("YYYY-MM-dd HH:mm 'UTC'"),
+          getEnv("ATTIO_DEAL_SLUG_EMAIL_LAST_ACTION", "email_last_action"): now().utc.format("YYYY-MM-dd'T'HH:mm:ss"),
         }
       }
     }
