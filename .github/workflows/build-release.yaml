@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        nim: ["binary:2.2.2"]
+        nim: ["binary:1.6.18"]
     uses: ./.github/workflows/runner-main.yaml
     with:
       container: 'attioemailtracking'

@@ -1,8 +1,13 @@
 
+when NimMajor >= 2:
+  import std/envvars
+else:
+  import std/os
+
+
 import
   std/[
     base64,
-    envvars,
     json,
     strutils,
     times
