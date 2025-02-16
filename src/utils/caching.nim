@@ -31,7 +31,7 @@ type
     # }
     rateLimitOpen = "attio:ratelimit:open:ident:$1"
     rateLimitClick = "attio:ratelimit:click:ident:$1"
-    companyDomainToCompanyID = "attio:company:domain:$1" 
+    companyDomainToCompanyID = "attio:company:domain:$1"
     companyDomainToDealID = "attio:company:deal:$1"
 
 
