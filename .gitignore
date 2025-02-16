@@ -6,4 +6,5 @@ attio_email_tracking
 !nimbledeps/pkgs2
 dev.sh
 tests/image.png
+tests/dev*
 privatechrome/

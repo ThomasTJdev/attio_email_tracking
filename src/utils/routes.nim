@@ -75,7 +75,9 @@ proc handlerWebhookAttioEmail*(request: Request) =
   let data = %*{
     "email": email,
     "subject": subject,
-    "epoch": toInt(epochTime())
+    "epoch": toInt(epochTime()),
+    "opens": 0,
+    "clicks": {}
   }
   cacheSet(CacheKey.emailData, ident, data)
   when defined(dev):
@@ -94,7 +96,14 @@ proc handlerWebhookAttioEmailOpen*(request: Request) =
   #
   let (exists, data) = cacheGet(CacheKey.emailData, ident)
   if exists:
-    emailAction(data, MailAction.open, userAgent = (if request.headers.hasKey("User-Agent"): request.headers["User-Agent"] else: ""))
+    # Incr open
+    var times = 1
+    if data.hasKey("opens"):
+      times = data["opens"].getInt() + 1
+    data["opens"] = times.newJInt()
+    cacheSet(CacheKey.emailData, ident, data)
+    # Action
+    emailAction(data, MailAction.open, userAgent = (if request.headers.hasKey("User-Agent"): request.headers["User-Agent"] else: ""), actionTimes = times)
   else:
     when defined(dev):
       echo("Error: event email_opened for ident: " & ident & " not found in cache")
@@ -127,8 +136,18 @@ proc handlerWebhookAttioEmailClick*(request: Request) =
 
   let (exists, data) = cacheGet(CacheKey.emailData, ident)
   if exists:
+    # Incr click
+    var times: int = 1
+    if data["clicks"].hasKey(link):
+      times = data["clicks"][link].getInt() + 1
+      data["clicks"][link] = times.newJInt()
+    else:
+      data["clicks"][link] = 1.newJInt()
+    cacheSet(CacheKey.emailData, ident, data)
+
+    # Action
     clickedUrl = decode(link)
-    emailAction(data, MailAction.click, userAgent = (if request.headers.hasKey("User-Agent"): request.headers["User-Agent"] else: ""), clickedUrl = clickedUrl)
+    emailAction(data, MailAction.click, userAgent = (if request.headers.hasKey("User-Agent"): request.headers["User-Agent"] else: ""), clickedUrl = clickedUrl, actionTimes = times)
   else:
     when defined(dev):
       echo("Error: event email_clicked for ident: " & ident & " not found in cache")

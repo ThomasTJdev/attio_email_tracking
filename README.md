@@ -129,10 +129,13 @@ export ATTIO_WEBHOOK_SECRET=your_security_token
 # People and Company slug for the email tracking data
 export ATTIO_PEOPLE_SLUG_EMAIL_OPEN=email_opened
 export ATTIO_PEOPLE_SLUG_EMAIL_CLICK=email_clicked
+export ATTIO_PEOPLE_SLUG_EMAIL_LAST_ACTION=email_last_action
 export ATTIO_COMPANY_SLUG_EMAIL_OPEN=email_opened
 export ATTIO_COMPANY_SLUG_EMAIL_CLICK=email_clicked
+export ATTIO_COMPANY_SLUG_EMAIL_LAST_ACTION=email_last_action
 export ATTIO_DEAL_SLUG_EMAIL_OPEN=email_opened
 export ATTIO_DEAL_SLUG_EMAIL_CLICK=email_clicked
+export ATTIO_DEAL_SLUG_EMAIL_LAST_ACTION=email_last_action
 
 # Where to send the email tracking data
 export ATTIO_TRACKER_PEOPLE_ON=true

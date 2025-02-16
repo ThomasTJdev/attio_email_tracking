@@ -120,7 +120,7 @@ proc attioApiPatchDeals(dealRecordId: string, body: JsonNode): bool =
   return success
 
 
-proc emailAction*(parsed: JsonNode, mailAction: MailAction, userAgent = "", clickedUrl = "") =
+proc emailAction*(parsed: JsonNode, mailAction: MailAction, userAgent = "", clickedUrl = "", actionTimes = 1) =
   ## Handle an email open event
   ## 1. Get email data from cache and parse as JSON
   ## 2. Check if the rate limit is open based on parsed["email"]
@@ -136,6 +136,11 @@ proc emailAction*(parsed: JsonNode, mailAction: MailAction, userAgent = "", clic
     domain = email.split("@")[1]
     subject = parsed["subject"].getStr()
 
+  var numberOfTimes =
+    if actionTimes == 1:
+      ""
+    else:
+      " (" & $actionTimes & ") "
 
   #
   # Person object
@@ -159,16 +164,17 @@ proc emailAction*(parsed: JsonNode, mailAction: MailAction, userAgent = "", clic
     let
       info = (
         if mailAction == MailAction.open:
-          subject & " - (" & now().utc.format("YYYY-MM-dd HH:mm 'UTC'") & ")" #& " - [" & userAgent & "]"
+          numberOfTimes & subject & " - (" & now().utc.format("YYYY-MM-dd HH:mm 'UTC'") & ")" #& " - [" & userAgent & "]"
         else:
-          subject & " - URL: " & clickedUrl & " - (" & now().utc.format("YYYY-MM-dd HH:mm 'UTC'") & ")" #& " - [" & userAgent & "]"
+          numberOfTimes & subject & " - URL: " & clickedUrl & " - (" & now().utc.format("YYYY-MM-dd HH:mm 'UTC'") & ")" #& " - [" & userAgent & "]"
       )
 
     let body = %*{
       "data": {
         "values": {
           "email_addresses": @[email],
-          slug: info
+          slug: info,
+          getEnv("ATTIO_PEOPLE_SLUG_EMAIL_LAST_ACTION", "email_last_action"): now().utc.format("YYYY-MM-dd HH:mm 'UTC'"),
         }
       }
     }
@@ -199,16 +205,17 @@ proc emailAction*(parsed: JsonNode, mailAction: MailAction, userAgent = "", clic
     let
       info = (
         if mailAction == MailAction.open:
-          email & " opened: " & subject & " - (" & now().utc.format("YYYY-MM-dd HH:mm 'UTC'") & ")" 
+          numberOfTimes & email & " opened: " & subject & " - (" & now().utc.format("YYYY-MM-dd HH:mm 'UTC'") & ")" 
         else:
-          email & " clicked: " & subject & " - URL: " & clickedUrl & " - (" & now().utc.format("YYYY-MM-dd HH:mm 'UTC'") & ")" 
+          numberOfTimes & email & " clicked: " & subject & " - URL: " & clickedUrl & " - (" & now().utc.format("YYYY-MM-dd HH:mm 'UTC'") & ")"
       )
 
     let body = %*{
       "data": {
         "values": {
           "domains": @[domain],
-          slug: info
+          slug: info,
+          getEnv("ATTIO_COMPANY_SLUG_EMAIL_LAST_ACTION", "email_last_action"): now().utc.format("YYYY-MM-dd HH:mm 'UTC'"),
         }
       }
     }
@@ -239,9 +246,9 @@ proc emailAction*(parsed: JsonNode, mailAction: MailAction, userAgent = "", clic
     let
       info = (
         if mailAction == MailAction.open:
-          email & " opened: " & subject & " - (" & now().utc.format("YYYY-MM-dd HH:mm 'UTC'") & ")"
+          numberOfTimes & email & " opened: " & subject & " - (" & now().utc.format("YYYY-MM-dd HH:mm 'UTC'") & ")"
         else:
-          email & " clicked: " & subject & " - URL: " & clickedUrl & " - (" & now().utc.format("YYYY-MM-dd HH:mm 'UTC'") & ")" 
+          numberOfTimes & email & " clicked: " & subject & " - URL: " & clickedUrl & " - (" & now().utc.format("YYYY-MM-dd HH:mm 'UTC'") & ")"
       )
 
     let associatedCompany = attioApiGetCompanyUUID(domain)
@@ -256,7 +263,8 @@ proc emailAction*(parsed: JsonNode, mailAction: MailAction, userAgent = "", clic
     let body = %*{
       "data": {
         "values": {
-          slug: info
+          slug: info,
+          getEnv("ATTIO_DEAL_SLUG_EMAIL_LAST_ACTION", "email_last_action"): now().utc.format("YYYY-MM-dd HH:mm 'UTC'"),
         }
       }
     }

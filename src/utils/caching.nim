@@ -18,6 +18,17 @@ import
 type
   CacheKey* = enum
     emailData = "attio:email:ident:$1"
+    # emailData =
+    # let data = %*{
+    #   "email": email,
+    #   "subject": subject,
+    #   "epoch": toInt(epochTime()),
+    #   "opens": 0,
+    #   "clicks": {
+    #     "link.com": 0,
+    #     "link.com": 0
+    #   }
+    # }
     rateLimitOpen = "attio:ratelimit:open:ident:$1"
     rateLimitClick = "attio:ratelimit:click:ident:$1"
     companyDomainToCompanyID = "attio:company:domain:$1" 
@@ -37,7 +48,7 @@ proc cacheGet*(keyformat: CacheKey, ident: string): (bool, JsonNode) =
     return (true, parseJson(data))
 
 
-proc cacheSet*(keyformat: CacheKey, key: string, value: JsonNode, expire = getEnv("EMAIL_CACHE_TIME", "2629800")) =
+proc cacheSet*(keyformat: CacheKey, key: string, value: JsonNode, expire = getEnv("EMAIL_CACHE_TIME", "157680000")) =
   ## Set a value in the cache
   # 2629800 seconds = 1 month
   discard conn.command("SET", ($keyformat).format(key), $value, "EX", expire)
@@ -56,3 +67,4 @@ proc cacheRateLimitSet*(keyformat: CacheKey, ident: string) =
 proc cacheClear*() =
   ## Clear the cache
   discard conn.command("FLUSHALL")
+
