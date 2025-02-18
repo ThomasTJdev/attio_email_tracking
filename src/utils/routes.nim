@@ -88,7 +88,7 @@ proc handlerWebhookAttioEmail*(request: Request) =
 
 proc isBlockedDueInit(epoch: int): bool =
   ## Check if the time is blocked
-  return toInt(epochTime()) - epoch < 3
+  return toInt(epochTime()) - epoch < 5
 
 
 proc handlerWebhookAttioEmailOpen*(request: Request) =

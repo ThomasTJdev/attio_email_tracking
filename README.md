@@ -51,6 +51,13 @@ Your Attio CRM manager will provide you with an API key and the endpoint to send
 1. Click on the extension icon in the top right corner.
 2. Enter the secret key and the endpoint URL from you Attio CRM manager.
 
+#### Warning
+
+If you use the manual injection button, then you should wait clicking on that
+until you are actually sending! From the second you click on it, you have 5
+seconds to send the email, otherwise Google's images cacher will make a "fake"
+has been opened.
+
 
 ### Server
 
