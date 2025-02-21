@@ -45,7 +45,10 @@ proc cacheGet*(keyformat: CacheKey, ident: string): (bool, JsonNode) =
   if data == "":
     return (false, nil)
   else:
-    return (true, parseJson(data))
+    try:
+      result = (true, parseJson(data))
+    except:
+      result = (false, nil)
 
 
 proc cacheSet*(keyformat: CacheKey, key: string, value: JsonNode, expire = getEnv("EMAIL_CACHE_TIME", "157680000")) =
@@ -56,7 +59,7 @@ proc cacheSet*(keyformat: CacheKey, key: string, value: JsonNode, expire = getEn
 
 proc cacheRateLimitBlock*(keyformat: CacheKey, ident: string): bool =
   ## Check if a key exists in the cache
-  return conn.command("EXISTS", ($keyformat).format(ident)).to(int) == 1
+  return conn.command("EXISTS", ($keyformat).format(ident)).to(Option[int]).get(0) == 1
 
 
 proc cacheRateLimitSet*(keyformat: CacheKey, ident: string) =

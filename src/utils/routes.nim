@@ -102,7 +102,7 @@ proc handlerWebhookAttioEmailOpen*(request: Request) =
   let (exists, data) = cacheGet(CacheKey.emailData, ident)
   if exists:
 
-    if isBlockedDueInit(data["epoch"].getInt()):
+    if data.hasKey("epoch") and isBlockedDueInit(data["epoch"].getInt()):
       discard
     else:
       # Incr open

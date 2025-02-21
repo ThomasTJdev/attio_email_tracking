@@ -77,8 +77,11 @@ proc attioApiGetCompanyUUID(domain: string): string =
     }
   })
   if success:
-    let uuid = parseJson(body)["data"]["id"]["record_id"].getStr()
-    cacheSet(CacheKey.companyDomainToCompanyID, domain, %*{"uuid": uuid}, expire = "86400")
+    try:
+      let uuid = parseJson(body)["data"]["id"]["record_id"].getStr()
+      cacheSet(CacheKey.companyDomainToCompanyID, domain, %*{"uuid": uuid}, expire = "86400")
+    except:
+      return ""
   else:
     return ""
 
