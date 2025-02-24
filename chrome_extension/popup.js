@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("trackingManually").checked = data.CONSTANTS.TRACKING_MANUALLY || false;
       document.getElementById("trackingOwner").value = data.CONSTANTS.TRACKING_AUTO_FOR_OWNER || "";
       document.getElementById("customImgUrl").value = data.CONSTANTS.CUSTOM_IMAGE_URL || "";
+      document.getElementById("trackLinks").checked = data.CONSTANTS.TRACK_LINKS || false;
     }
   });
 
@@ -18,6 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
       TRACKING_MANUALLY: document.getElementById("trackingManually").checked,
       TRACKING_AUTO_FOR_OWNER: document.getElementById("trackingOwner").value.trim(),
       CUSTOM_IMAGE_URL: document.getElementById("customImgUrl").value.trim(),
+      TRACK_LINKS: document.getElementById("trackLinks").checked
     };
 
     // Store constants

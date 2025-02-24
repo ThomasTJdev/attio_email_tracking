@@ -124,8 +124,10 @@ async function handleTracking(composeView, CONSTANTS) {
   // Insert tracking pixel and rewrite links
   console.log("🖼️ Inserting tracking pixel");
   insertTrackingPixel(composeView, trackingId, CONSTANTS.SERVER_URL, CONSTANTS.CUSTOM_IMAGE_URL);
-  console.log("🔗 Rewriting links");
-  rewriteLinks(composeView, trackingId, CONSTANTS.SERVER_URL);
+  if (CONSTANTS.TRACK_LINKS) {
+    console.log("🔗 Rewriting links");
+    rewriteLinks(composeView, trackingId, CONSTANTS.SERVER_URL);
+  }
   console.log("✅ Tracking completed");
 }
 

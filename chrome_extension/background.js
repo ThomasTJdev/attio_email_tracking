@@ -19,6 +19,7 @@ chrome.runtime.onInstalled.addListener(() => {
         TRACKING_MANUALLY: true,
         TRACKING_AUTO_FOR_OWNER: "you@main.crm.email",
         CUSTOM_IMAGE_URL: "",
+        TRACK_LINKS: false
       };
 
       chrome.storage.local.set({ CONSTANTS }, () => {
