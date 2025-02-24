@@ -6,6 +6,7 @@ else:
 
 import
   std/[
+    base64,
     json,
     options,
     strutils
@@ -51,6 +52,7 @@ proc cacheGet*(keyformat: CacheKey, ident: string): (bool, JsonNode) =
       except:
         result = (false, nil)
   except:
+    echo "Failed to get cache for key: " & ident & " - (" & decode(key) & ") - " & getCurrentExceptionMsg()
     result = (false, nil)
 
 proc cacheSet*(keyformat: CacheKey, key: string, value: JsonNode, expire = getEnv("EMAIL_CACHE_TIME", "157680000")) =
@@ -59,7 +61,7 @@ proc cacheSet*(keyformat: CacheKey, key: string, value: JsonNode, expire = getEn
   try:
     discard conn.command("SET", ($keyformat).format(key), $value, "EX", expire)
   except:
-    echo "Failed to set cache for key: " & key
+    echo "Failed to set cache for key: " & key & " - (" & decode(key) & ") - " & getCurrentExceptionMsg()
 
 
 proc cacheRateLimitBlock*(keyformat: CacheKey, ident: string): bool =
@@ -67,7 +69,7 @@ proc cacheRateLimitBlock*(keyformat: CacheKey, ident: string): bool =
   try:
     return conn.command("EXISTS", ($keyformat).format(ident)).to(Option[int]).get(0) == 1
   except:
-    echo "Failed to check rate limit for key: " & ident
+    echo "Failed to check rate limit for key: " & ident & " - " & getCurrentExceptionMsg()
     return false
 
 
@@ -76,7 +78,7 @@ proc cacheRateLimitSet*(keyformat: CacheKey, ident: string) =
   try:
     discard conn.command("SET", ($keyformat).format(ident), "block", "EX", getEnv("ATTIO_API_RATE_LIMIT", "5"))
   except:
-    echo "Failed to set rate limit for key: " & ident
+    echo "Failed to set rate limit for key: " & ident & " - " & getCurrentExceptionMsg()
 
 
 proc cacheClear*() =
@@ -84,5 +86,5 @@ proc cacheClear*() =
   try:
     discard conn.command("FLUSHALL")
   except:
-    echo "Failed to clear cache"
+    echo "Failed to clear cache" & " - " & getCurrentExceptionMsg()
 

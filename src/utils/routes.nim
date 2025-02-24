@@ -99,7 +99,7 @@ proc handlerWebhookAttioEmailOpen*(request: Request) =
   #
   # Get email data from cache
   #
-  let (exists, data) = cacheGet(CacheKey.emailData, ident)
+  var (exists, data) = cacheGet(CacheKey.emailData, ident)
   if exists:
 
     if data.hasKey("epoch") and isBlockedDueInit(data["epoch"].getInt()):
@@ -143,10 +143,10 @@ proc handlerWebhookAttioEmailClick*(request: Request) =
   #
   var clickedUrl = ""
 
-  let (exists, data) = cacheGet(CacheKey.emailData, ident)
+  var (exists, data) = cacheGet(CacheKey.emailData, ident)
   if exists:
 
-    if isBlockedDueInit(data["epoch"].getInt()):
+    if data.hasKey("epoch") and isBlockedDueInit(data["epoch"].getInt()):
       discard
     else:
       # Incr click
