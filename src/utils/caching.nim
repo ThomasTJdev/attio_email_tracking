@@ -41,33 +41,48 @@ let conn = newRedisConn(address = getEnv("REDIS_HOST", "localhost"))
 
 proc cacheGet*(keyformat: CacheKey, ident: string): (bool, JsonNode) =
   ## Get a value from the cache
-  let data = conn.command("GET", ($keyformat).format(ident)).to(Option[string]).get("")
-  if data == "":
-    return (false, nil)
-  else:
-    try:
-      result = (true, parseJson(data))
-    except:
-      result = (false, nil)
-
+  try:
+    let data = conn.command("GET", ($keyformat).format(ident)).to(Option[string]).get("")
+    if data == "":
+      return (false, nil)
+    else:
+      try:
+        result = (true, parseJson(data))
+      except:
+        result = (false, nil)
+  except:
+    result = (false, nil)
 
 proc cacheSet*(keyformat: CacheKey, key: string, value: JsonNode, expire = getEnv("EMAIL_CACHE_TIME", "157680000")) =
   ## Set a value in the cache
   # 2629800 seconds = 1 month
-  discard conn.command("SET", ($keyformat).format(key), $value, "EX", expire)
+  try:
+    discard conn.command("SET", ($keyformat).format(key), $value, "EX", expire)
+  except:
+    echo "Failed to set cache for key: " & key
 
 
 proc cacheRateLimitBlock*(keyformat: CacheKey, ident: string): bool =
   ## Check if a key exists in the cache
-  return conn.command("EXISTS", ($keyformat).format(ident)).to(Option[int]).get(0) == 1
+  try:
+    return conn.command("EXISTS", ($keyformat).format(ident)).to(Option[int]).get(0) == 1
+  except:
+    echo "Failed to check rate limit for key: " & ident
+    return false
 
 
 proc cacheRateLimitSet*(keyformat: CacheKey, ident: string) =
   ## Set key which blocks further requests for a certain time
-  discard conn.command("SET", ($keyformat).format(ident), "block", "EX", getEnv("ATTIO_API_RATE_LIMIT", "5"))
+  try:
+    discard conn.command("SET", ($keyformat).format(ident), "block", "EX", getEnv("ATTIO_API_RATE_LIMIT", "5"))
+  except:
+    echo "Failed to set rate limit for key: " & ident
 
 
 proc cacheClear*() =
   ## Clear the cache
-  discard conn.command("FLUSHALL")
+  try:
+    discard conn.command("FLUSHALL")
+  except:
+    echo "Failed to clear cache"
 

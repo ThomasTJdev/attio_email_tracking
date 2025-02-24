@@ -6,6 +6,7 @@ else:
 
 import
   std/[
+    base64,
     json,
     httpcore,
     httpclient,
@@ -64,7 +65,7 @@ proc attioApiPutCompany(domain: string, body: JsonNode): bool =
 proc attioApiGetCompanyUUID(domain: string): string =
   ## Get the company ID from Attio
 
-  let (cacheSucces, cachedJson) = cacheGet(CacheKey.companyDomainToCompanyID, domain)
+  let (cacheSucces, cachedJson) = cacheGet(CacheKey.companyDomainToCompanyID, encode(domain))
   if cacheSucces:
     return cachedJson["uuid"].getStr()
 
@@ -79,7 +80,7 @@ proc attioApiGetCompanyUUID(domain: string): string =
   if success:
     try:
       let uuid = parseJson(body)["data"]["id"]["record_id"].getStr()
-      cacheSet(CacheKey.companyDomainToCompanyID, domain, %*{"uuid": uuid}, expire = "86400")
+      cacheSet(CacheKey.companyDomainToCompanyID, encode(domain), %*{"uuid": uuid}, expire = "86400")
     except:
       return ""
   else:
@@ -89,7 +90,7 @@ proc attioApiGetCompanyUUID(domain: string): string =
 proc attioApiGetDealsUUID(domain, companyUUID: string): string =
   ## Get the deal ID from Attio
 
-  let (cacheSucces, cachedJson) = cacheGet(CacheKey.companyDomainToDealID, companyUUID)
+  let (cacheSucces, cachedJson) = cacheGet(CacheKey.companyDomainToDealID, encode(companyUUID))
   if cacheSucces:
     return cachedJson["uuid"].getStr()
 
@@ -110,7 +111,7 @@ proc attioApiGetDealsUUID(domain, companyUUID: string): string =
       uuid = parseJson(body)["data"][0]["id"]["record_id"].getStr()
     except:
       return ""
-    cacheSet(CacheKey.companyDomainToDealID, domain, %*{"uuid": uuid}, expire = "86400")
+    cacheSet(CacheKey.companyDomainToDealID, encode(domain), %*{"uuid": uuid}, expire = "86400")
     return uuid
   else:
     return ""
@@ -152,7 +153,7 @@ proc emailAction*(parsed: JsonNode, mailAction: MailAction, userAgent = "", clic
   #    so it needs to be set to "false" to disable tracking.
   if (
     getEnv("ATTIO_TRACKER_PEOPLE_ON").toLowerAscii() != "false" and
-    not cacheRateLimitBlock(CacheKey.rateLimitOpen, email)
+    not cacheRateLimitBlock(CacheKey.rateLimitOpen, encode(email))
   ):
     when defined(dev):
       echo("Person tracking is enabled")
@@ -183,7 +184,7 @@ proc emailAction*(parsed: JsonNode, mailAction: MailAction, userAgent = "", clic
     }
 
     discard attioApiPutPerson(email, body)
-    cacheRateLimitSet(CacheKey.rateLimitOpen, email)
+    cacheRateLimitSet(CacheKey.rateLimitOpen, encode(email))
 
 
   #
@@ -193,7 +194,7 @@ proc emailAction*(parsed: JsonNode, mailAction: MailAction, userAgent = "", clic
   #    so it needs to be set to "true" to enable tracking.
   if (
     getEnv("ATTIO_TRACKER_COMPANY_ON").toLowerAscii() == "true" and
-    not cacheRateLimitBlock(CacheKey.rateLimitOpen, domain)
+    not cacheRateLimitBlock(CacheKey.rateLimitOpen, encode(domain))
   ):
     when defined(dev):
       echo("Company tracking is enabled")
@@ -224,7 +225,7 @@ proc emailAction*(parsed: JsonNode, mailAction: MailAction, userAgent = "", clic
     }
 
     discard attioApiPutCompany(domain, body)
-    cacheRateLimitSet(CacheKey.rateLimitOpen, domain)
+    cacheRateLimitSet(CacheKey.rateLimitOpen, encode(domain))
 
 
   #
@@ -234,7 +235,7 @@ proc emailAction*(parsed: JsonNode, mailAction: MailAction, userAgent = "", clic
   #    so it needs to be set to "true" to enable tracking.
   if (
     getEnv("ATTIO_TRACKER_DEAL_ON").toLowerAscii() == "true" and
-    not cacheRateLimitBlock(CacheKey.rateLimitOpen, "deal-" & domain)
+    not cacheRateLimitBlock(CacheKey.rateLimitOpen, "deal-" & encode(domain))
   ):
     when defined(dev):
       echo("Deal tracking is enabled")
@@ -273,7 +274,7 @@ proc emailAction*(parsed: JsonNode, mailAction: MailAction, userAgent = "", clic
     }
 
     discard attioApiPatchDeals(dealRecordId, body)
-    cacheRateLimitSet(CacheKey.rateLimitOpen, associatedCompany)
+    cacheRateLimitSet(CacheKey.rateLimitOpen, "deal-" & encode(domain))
 
 
 
