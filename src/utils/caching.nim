@@ -52,7 +52,7 @@ proc cacheGet*(keyformat: CacheKey, ident: string): (bool, JsonNode) =
       except:
         result = (false, nil)
   except:
-    echo "Failed to get cache for key: " & ident & " - (" & decode(key) & ") - " & getCurrentExceptionMsg()
+    echo "Failed to get cache for key: " & ident & " - (" & decode(ident) & ") - " & getCurrentExceptionMsg()
     result = (false, nil)
 
 proc cacheSet*(keyformat: CacheKey, key: string, value: JsonNode, expire = getEnv("EMAIL_CACHE_TIME", "157680000")) =
