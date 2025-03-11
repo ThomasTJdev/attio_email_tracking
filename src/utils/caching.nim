@@ -37,7 +37,13 @@ type
 
 
 # Cache connection
-let conn = newRedisConn(address = getEnv("REDIS_HOST", "localhost"))
+var conn = newRedisConn(address = getEnv("REDIS_HOST", "localhost"))
+
+
+template reconnectRedisConn*() =
+  ## Reconnect to the Redis connection
+  conn.close()
+  conn = newRedisConn(address = getEnv("REDIS_HOST", "localhost"))
 
 
 proc cacheGet*(keyformat: CacheKey, ident: string): (bool, JsonNode) =
@@ -49,6 +55,8 @@ proc cacheGet*(keyformat: CacheKey, ident: string): (bool, JsonNode) =
       return (false, nil)
   except:
     echo "Failed to check cache for key #1: " & ident & " - " & getCurrentExceptionMsg()
+    if getCurrentExceptionMsg().contains("connection is in a broken state"):
+      reconnectRedisConn()
     return (false, nil)
 
   var tmp: string
@@ -56,6 +64,8 @@ proc cacheGet*(keyformat: CacheKey, ident: string): (bool, JsonNode) =
     tmp = conn.command("GET", key).to(Option[string]).get("")
   except:
     echo "Failed to get cache for key #2: " & ident & " - " & getCurrentExceptionMsg()
+    if getCurrentExceptionMsg().contains("connection is in a broken state"):
+      reconnectRedisConn()
     return (false, nil)
 
   if tmp == "":
