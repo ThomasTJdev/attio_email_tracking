@@ -1,5 +1,26 @@
 
 
+function blockTrackerImages(TRACKER_URL) {
+  // Use partial URL matching to find tracker images
+  const images = document.querySelectorAll(`img[src*="${TRACKER_URL}/webhook/"]`);
+  images.forEach(image => {
+    console.log("🚫 Blocking tracker image:", image.src);
+    // Remove the ident parameter from the URL
+    if (image.src.includes('ident=')) {
+      const url = new URL(image.src);
+      url.searchParams.delete('ident');
+      image.src = url.toString();
+    } else {
+      image.src = '';  // Remove the source if we can't process it
+    }
+    console.log(image);
+  });
+}
+
+
+
+
+
 
 // Get constants
 
@@ -13,6 +34,12 @@ InboxSDK.load(2, 'sdk_TrackForAttio_665d14e77e').then(async (sdk) => {
     console.error("❌ Failed to load constants:", error);
     return; // Exit if constants are missing
   }
+
+  // Run the blocking function when the page is loaded
+  blockTrackerImages(CONSTANTS.TRACKER_URL);
+  // Optional: Observe for dynamically loaded content (like when Gmail fetches new emails)
+  const observer = new MutationObserver(blockTrackerImages);
+  observer.observe(document.body, { childList: true, subtree: true });
 
   // Register a handler for compose views
   sdk.Compose.registerComposeViewHandler((composeView) => {
@@ -208,8 +235,19 @@ function removeExistingTrackingPixels(composeView) {
   const body = composeView.getBodyElement();
   if (!body) return;
 
+  // Try to remove by class first
   const existingPixels = body.querySelectorAll(".attio-tracking-pixel");
   existingPixels.forEach((pixel) => pixel.remove());
+
+  // Also search for tracking images by URL pattern in case the class was removed
+  const allImages = body.querySelectorAll('img');
+  allImages.forEach((img) => {
+    if (img.src && img.src.includes('/webhook/attio/email_opened.png')) {
+      console.log("🗑️ Removing tracking pixel by URL pattern:", img.src);
+      img.remove();
+    }
+  });
+
 }
 
 // Function to rewrite links in the email body with tracking ID
