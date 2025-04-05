@@ -1,4 +1,3 @@
-
 when NimMajor >= 2:
   import std/envvars
 else:
@@ -37,13 +36,28 @@ type
 
 
 # Cache connection
-var conn = newRedisConn(address = getEnv("REDIS_HOST", "localhost"))
+proc newRedis(): RedisConn =
+  var conn: RedisConn
+  try:
+    conn = newRedisConn(address = getEnv("REDIS_HOST", "localhost"))
+  except RedisError as e:
+    echo "Redis error: " & e.msg
+    conn = nil
+  return conn
+var conn = newRedis()
 
 
-template reconnectRedisConn*() =
-  ## Reconnect to the Redis connection
-  conn.close()
-  conn = newRedisConn(address = getEnv("REDIS_HOST", "localhost"))
+proc reconnectRedisConn*() =
+  try:
+    if not isNil(conn):
+      try:
+        conn.close()
+      except:
+        discard  # Ignore quit errors
+    conn = newRedis()
+  except Exception as e:
+    echo "Failed to reconnect to Redis: " & e.msg
+    conn = nil
 
 
 proc cacheGet*(keyformat: CacheKey, ident: string): (bool, JsonNode) =
@@ -51,38 +65,44 @@ proc cacheGet*(keyformat: CacheKey, ident: string): (bool, JsonNode) =
   let key = ($keyformat).format(ident)
 
   try:
-    if conn.command("EXISTS", key).to(int) != 1:
+    if isNil(conn):
+      reconnectRedisConn()
+    if isNil(conn):
       return (false, nil)
-  except:
-    echo "Failed to check cache for key #1: " & ident & " - " & getCurrentExceptionMsg()
-    if getCurrentExceptionMsg().contains("connection is in a broken state"):
-      reconnectRedisConn()
-    return (false, nil)
 
-  var tmp: string
-  try:
-    tmp = conn.command("GET", key).to(Option[string]).get("")
-  except:
-    echo "Failed to get cache for key #2: " & ident & " - " & getCurrentExceptionMsg()
-    if getCurrentExceptionMsg().contains("connection is in a broken state"):
-      reconnectRedisConn()
+    # First try to get the value directly
+    let tmp = conn.command("GET", key).to(Option[string]).get("")
+    if tmp != "":
+      try:
+        let parsed = parseJson(tmp)
+        if parsed.kind != JObject:
+          echo "Invalid JSON type for key: " & ident & " - expected JObject, got " & $parsed.kind
+          return (false, nil)
+        return (true, parsed)
+      except:
+        echo "Failed to parse JSON for key: " & ident & " - (" & decode(ident) & ") - " & getCurrentExceptionMsg()
+        return (false, nil)
+    else:
+      # Key doesn't exist or is empty
+      return (false, nil)
+  except RedisError as e:
+    echo "Redis error getting cache: " & e.msg
+    reconnectRedisConn()
     return (false, nil)
-
-  if tmp == "":
-    return (false, nil)
-
-  try:
-    result = (true, parseJson(tmp))
   except:
-    echo "Failed to get cache for key #3: " & ident & " - (" & decode(ident) & ") - " & getCurrentExceptionMsg()
-    result = (false, nil)
+    echo "Failed to get cache for key: " & ident & " - " & getCurrentExceptionMsg()
+    reconnectRedisConn()
+    return (false, nil)
 
 
 proc cacheSet*(keyformat: CacheKey, key: string, value: JsonNode, expire = getEnv("EMAIL_CACHE_TIME", "157680000")) =
   ## Set a value in the cache
   # 2629800 seconds = 1 month
   try:
-    discard conn.command("SET", ($keyformat).format(key), $value, "EX", expire)
+    if isNil(conn):
+      reconnectRedisConn()
+    if not isNil(conn):
+      discard conn.command("SET", ($keyformat).format(key), $value, "EX", expire)
   except:
     echo "Failed to set cache for key: " & key & " - (" & decode(key) & ") - " & getCurrentExceptionMsg()
 
@@ -103,9 +123,12 @@ proc cacheRateLimitBlock*(keyformat: CacheKey, ident: string): bool =
 
 proc cacheRateLimitSet*(keyformat: CacheKey, ident: string) =
   ## Set key which blocks further requests for a certain time
-  let expire = getEnv("ATTIO_API_RATE_LIMIT", "5")
+  let expire = getEnv("ATTIO_API_RATE_LIMIT", "10")
   try:
-    discard conn.command("SET", ($keyformat).format(ident), "block", "EX", (if expire.len > 0: expire else: "5"))
+    if isNil(conn):
+      reconnectRedisConn()
+    if not isNil(conn):
+      discard conn.command("SET", ($keyformat).format(ident), "block", "EX", (if expire.len > 0: expire else: "10"))
   except:
     echo "Failed to set rate limit for key: " & ident & " - " & getCurrentExceptionMsg()
 
@@ -113,7 +136,10 @@ proc cacheRateLimitSet*(keyformat: CacheKey, ident: string) =
 proc cacheClear*() =
   ## Clear the cache
   try:
-    discard conn.command("FLUSHALL")
+    if isNil(conn):
+      reconnectRedisConn()
+    if not isNil(conn):
+      discard conn.command("FLUSHALL")
   except:
     echo "Failed to clear cache" & " - " & getCurrentExceptionMsg()
 

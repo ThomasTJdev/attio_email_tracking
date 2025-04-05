@@ -1,6 +1,6 @@
 # Package
 
-version       = "0.2.9"
+version       = "0.3.0"
 author        = "ThomasTJdev"
 description   = "Attio tracker for gmail sens"
 license       = "MIT"
